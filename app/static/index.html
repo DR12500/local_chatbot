@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Local Chatbot</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <aside id="sidebar">
+    <button id="new-chat" class="primary">+ New chat</button>
+    <ul id="chat-list"></ul>
+    <details id="settings">
+      <summary>Settings</summary>
+      <label>System prompt
+        <textarea id="system-prompt" rows="4"></textarea>
+      </label>
+      <label>Context window (tokens)
+        <select id="num-ctx">
+          <option value="4096">4k</option>
+          <option value="8192" selected>8k</option>
+          <option value="16384">16k</option>
+          <option value="32768">32k</option>
+        </select>
+      </label>
+      <label>Temperature <span id="temp-val"></span>
+        <input id="temperature" type="range" min="0" max="1.5" step="0.1" value="0.7">
+      </label>
+    </details>
+    <div id="status" class="muted"></div>
+  </aside>
+
+  <main>
+    <header>
+      <select id="model"></select>
+      <span id="stats" class="muted"></span>
+    </header>
+    <div id="messages"></div>
+    <form id="composer">
+      <textarea id="input" rows="3" placeholder="Message (Enter to send, Shift+Enter for a new line)"></textarea>
+      <button id="send" class="primary" type="submit">Send</button>
+    </form>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -20,7 +20,11 @@ $selected = if ($Tier -eq 'all') { $tiers.Values | ForEach-Object { $_ } } else 
 
 foreach ($model in $selected) {
     Write-Host "`n==> Pulling $model" -ForegroundColor Cyan
+    # ollama writes its progress bar to stderr. With 'Stop', PowerShell 5.1 treats that as
+    # an error when output is redirected, so judge success by the exit code instead.
+    $ErrorActionPreference = 'Continue'
     ollama pull $model
+    $ErrorActionPreference = 'Stop'
     if ($LASTEXITCODE -ne 0) { throw "Failed to pull $model" }
 }
 Write-Host "`nInstalled models:" -ForegroundColor Green

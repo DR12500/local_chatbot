@@ -112,6 +112,11 @@ async function loadModels() {
       o.textContent = `${m.name}  (${m.params || "?"}, ${m.size_gb} GB)`;
       sel.appendChild(o);
     }
+    // A model chosen in the launcher (?model=...) wins over the last-used one.
+    const params = new URLSearchParams(location.search);
+    const wanted = params.get("model");
+    if (wanted && data.models.some((m) => m.name === wanted)) state.settings.model = wanted;
+    if (params.has("model")) history.replaceState(null, "", "/");
     if (data.models.some((m) => m.name === state.settings.model)) sel.value = state.settings.model;
     state.settings.model = sel.value;
     $("status").textContent = "● Ollama connected (local)";

@@ -25,6 +25,30 @@ powershell -ExecutionPolicy Bypass -File scripts\setup.ps1 -Tier medium
 powershell -ExecutionPolicy Bypass -File scripts\start.ps1
 ```
 
+**Or use the model launcher** (a small window for choosing which model to chat with):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\create-shortcut.ps1   # once: Desktop + Start menu shortcut
+```
+
+Open **Local Chatbot** from the Desktop or the Start menu. It lists your installed models with a short description, the measured speed, and whether each is loaded. Pick one (double-click or **Open chat**) and it:
+- starts Ollama and the chat server if needed;
+- unloads the other models to free graphics memory (optional checkbox);
+- loads the chosen model;
+- opens the chat with that model selected.
+
+- **Unload selected** removes one model from graphics memory; **Unload all models** frees the graphics card completely, e.g. before gaming.
+- **Closing the launcher unloads all models** and stops the chat server it started, so no VRAM stays in use. Keep it open while chatting.
+- Even without the launcher, Ollama unloads a model by itself after 5 minutes without a message.
+
+### Where chat history is stored
+
+Chats are saved in the **browser's local storage** for the address `http://127.0.0.1:8765`, not by Ollama or the server. Nothing is stored in this project folder, and nothing is sent anywhere. Browser sync does not sync local storage.
+
+- **Location:** the browser profile on C:, e.g. for Edge (the default browser here) `%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Local Storage\leveldb\`. It is stored as unencrypted files there, readable by anyone with access to your Windows account.
+- **Tied to browser + exact address:** a different browser, a different profile, `localhost` instead of `127.0.0.1`, or a different port each show a separate, empty history.
+- **Deleted when** you delete a chat with × in the sidebar, or clear the browser's "cookies and site data".
+
 Then check that the model runs on the GPU:
 
 ```powershell
@@ -54,6 +78,16 @@ Generation speed is limited by memory bandwidth: every generated token reads all
 | **Medium** (8–14B) ⭐ | `qwen3:8b`, `gemma3:12b`, `qwen3:14b` | 5–9 GB | 6–11 GB | 40–85 tok/s | **The "decent chatbot" level.** Good writing, coding help, German/English, solid reasoning (qwen3 can "think"). About GPT-3.5 level or better |
 | **Large** (20–24B) | `gpt-oss:20b`, `mistral-small3.2:24b` | 14–15 GB | 14–16 GB | gpt-oss: 80–120 tok/s (MoE), mistral: 25–35 tok/s | Best that fits in 16 GB. Clearly better reasoning and coding. Mistral only fits with about 4k context |
 | **XL** (70B) | `llama3.3:70b` | 43 GB | Doesn't fit (spills to RAM) | 1–3 tok/s | Not practical here. Needs 48 GB+ of VRAM or a 64 GB+ unified-memory Mac |
+
+**Measured on this PC** (`app\bench.py`, Ollama 0.40.16, 8k context, all 100% GPU, 2026-11-20):
+
+| Model | Generation | Prompt reading | First load from SSD |
+|---|---|---|---|
+| `qwen3:8b` | 94.7 tok/s | 326 tok/s | 6.4 s |
+| `gemma3:12b` | 64.1 tok/s | 249 tok/s | 9.9 s |
+| `qwen3:14b` | 57.2 tok/s | 175 tok/s | 10.7 s |
+
+These are above the estimates in the table. The prompt-reading numbers come from a very short prompt, so they mostly measure startup overhead; long prompts are read much faster per token.
 
 **Recommendation:** start with `qwen3:14b` (all-round) and `gpt-oss:20b` (fast and smart). Use `qwen3:4b` when you want speed. `gpt-oss:20b` is a Mixture-of-Experts model: 21B parameters in total, but only about 3.6B active per token, so it is both larger *and* faster than the 14B models.
 
